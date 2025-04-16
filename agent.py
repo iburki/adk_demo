@@ -6,22 +6,31 @@ from google.adk.sessions import InMemorySessionService
 from google.genai import types
 from google.adk.tools import google_search, VertexAiSearchTool
 
-search_tool = VertexAiSearchTool(
-    data_store_id="data_store_id"
+MODEL_NAME = 'gemini-2.0-flash-live-preview-04-09'
+
+search_tool_parks = VertexAiSearchTool(
+    data_store_id="enter_data_store_id_here"
+)
+search_tool_airports = VertexAiSearchTool(
+    data_store_id="enter_data_store_id_here"
+)
+
+search_agent = LlmAgent(
+    model=MODEL_NAME,
+    name='search_agent',
+    instruction='You are a helpful assistant searching for answering questions on public transportation to La Guardia Airport.',
+    tools=[search_tool_airports],
 )
 
 root_agent = LlmAgent(
-    model='gemini-2.0-flash',
+    model=MODEL_NAME,
     name='root_agent',
-   instruction='you are helpful agent on unemployment. Use vertex ai search tool to answer questions about unemployment. If questions not related to unemployemnt use the google_search_agent',
-   tools=[search_tool]
+   instruction=f"""You are an expert on Central Park in New York City. Your goal is to answer user questions about the park as accurately as possible.
+                    If questions not related to Central Park, use the "{search_agent}"
+   """,
+   tools=[search_tool_parks]
     )
 
-search_agent = LlmAgent(
-    model='gemini-2.0-flash',
-    name='google_search_agent',
-    description='Gets information from google search',
-    instruction='You are a helpful assistant searching for content on google',
-    tools=[google_search],
-)
+
+
 
